@@ -72,7 +72,7 @@ app.get('/fruits/seed', (req, res) => {
         })
 })
 
-// Index route -> displays all fruits
+// INDEX route -> READ -> finds and displays all fruits
 
 app.get('/fruits', (req, res) => {
     // find all the fruits
@@ -85,6 +85,34 @@ app.get('/fruits', (req, res) => {
 
 })
 
+// SHOW route -> Read -> finds and displays a single resource.
+app.get('/fruits/:id', (req, res) => {
+    //get the ID -> save to a variable
+    const id = req.params.id
+    //use a mongoose method to find using that id
+    Fruit.findById(id)
+    //send the fruit as json upon success
+    .then(fruit => {
+        res.json({ fruit: fruit })
+    })
+    //catch any errors
+    .catch(err => console.log(err))
+})
+
+// CREATE route -> Create -> receives a request body, and creates a new document in the database
+app.post('/fruits', (req, res) => {
+    // here we'll have something called a "request body"
+    // inside this function, that will be called req.body
+    // we want to pass our req.body to the create method
+    const newFruit = req.body
+    Fruit.create(newFruit)
+    // send a 201 status, along with the json response of the new fruit
+    .then(fruit => {
+        res.status(201).json({ fruit: fruit.toObject() })
+    })
+    //send an error if one occurs
+    .catch(err => console.log(err))
+})
 
 // Create our server listener ----------------------------
 const PORT = process.env.PORT
