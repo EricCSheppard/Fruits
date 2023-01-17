@@ -85,20 +85,6 @@ app.get('/fruits', (req, res) => {
 
 })
 
-// SHOW route -> Read -> finds and displays a single resource.
-app.get('/fruits/:id', (req, res) => {
-    //get the ID -> save to a variable
-    const id = req.params.id
-    //use a mongoose method to find using that id
-    Fruit.findById(id)
-    //send the fruit as json upon success
-    .then(fruit => {
-        res.json({ fruit: fruit })
-    })
-    //catch any errors
-    .catch(err => console.log(err))
-})
-
 // CREATE route -> Create -> receives a request body, and creates a new document in the database
 app.post('/fruits', (req, res) => {
     // here we'll have something called a "request body"
@@ -113,6 +99,45 @@ app.post('/fruits', (req, res) => {
     //send an error if one occurs
     .catch(err => console.log(err))
 })
+
+
+// PUT route -> Update - > updates a specific fruit
+// PUT replaes the entire document with a new document from the req.body
+// PATCH is able to update specifi fields at specif times, but it requires more code to ensure that it works properly.
+app.put('/fruits/:id', (req, res) => {
+    // save the id to a variable for use later
+    const id = req.params.id
+    // save the request body to a variable for easy ref
+    const updatedFruit = req.body
+    // we're going to use the mongoose method:
+    // findByIdAndUpdate
+    // eventually we'll change how this route works, but for now we'll do everything in one shot.
+    Fruit.findByIdAndUpdate(id, updatedFruit, { new: true })
+        .then(fruit => {
+            console.log('the newly updated fruit', fruit)
+            // update sucess message will just be a 204 - no content
+            res.sendStatus(204)
+        })
+        .catch(err => console.log(err))
+})
+
+
+// DELETE route -> delete -> delete a specific fruit
+
+// SHOW route -> Read -> finds and displays a single resource.
+app.get('/fruits/:id', (req, res) => {
+    //get the ID -> save to a variable
+    const id = req.params.id
+    //use a mongoose method to find using that id
+    Fruit.findById(id)
+    //send the fruit as json upon success
+    .then(fruit => {
+        res.json({ fruit: fruit })
+    })
+    //catch any errors
+    .catch(err => console.log(err))
+})
+
 
 // Create our server listener ----------------------------
 const PORT = process.env.PORT
