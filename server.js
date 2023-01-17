@@ -72,6 +72,19 @@ app.get('/fruits/seed', (req, res) => {
         })
 })
 
+// Index route -> displays all fruits
+
+app.get('/fruits', (req, res) => {
+    // find all the fruits
+    Fruit.find({})
+        // send json if sucessful
+        .then(fruits => { res.json({ fruits: fruits })})
+        // catch errors if they occur
+        .catch(err => console.log('the following error occurredL \n', err))
+
+
+})
+
 
 // Create our server listener ----------------------------
 const PORT = process.env.PORT
