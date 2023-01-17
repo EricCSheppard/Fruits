@@ -123,6 +123,14 @@ app.put('/fruits/:id', (req, res) => {
 
 
 // DELETE route -> delete -> delete a specific fruit
+app.delete('/fruits/:id', (req, res) => {
+    const id = req.params.id
+    Fruit.findByIdAndRemove(id)
+    .then(() => {
+        res.sendStatus(204)
+    })
+    .catch(err => console.log(err))
+})
 
 // SHOW route -> Read -> finds and displays a single resource.
 app.get('/fruits/:id', (req, res) => {
