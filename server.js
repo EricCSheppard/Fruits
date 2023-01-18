@@ -7,10 +7,13 @@ const path = require('path') // import path module
 // const { ppid } = require('process')
 // const router = require('./controllers/fruitControllers')
 const FruitRouter = require('./controllers/fruitControllers')
+const UserRouter = require('./controllers/userControllers')
 const middleware = require('./utils/middleware')
 
 // Create our Express App Object ----------------------
 const app = express()
+
+middleware(app)
 
 // Routes ------------------------------------------
 app.get('/', (req, res) => {
@@ -21,8 +24,10 @@ app.get('/', (req, res) => {
 // app/use when we register a route, needs two arguments
 //the first arg is the base URL, second arg is the file to use
 app.use('/fruits', FruitRouter)
+app.use('/users', UserRouter)
 
-// Create our server listener ----------------------------
+
+// Create our server listener --------------------------
 const PORT = process.env.PORT
 app.listen(PORT, () => console.log(`Server is running on port: ${PORT}`))
-// END ---------------------------------------------------
+// END -------------------------------------------------
