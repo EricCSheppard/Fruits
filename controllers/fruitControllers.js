@@ -26,6 +26,9 @@ router.post('/', (req, res) => {
     // here we'll have something called a "request body"
     // inside this function, that will be called req.body
     // we want to pass our req.body to the create method
+    // we want to add an owner field to our fruit
+    // luckily for us, we saved the user's id on the session object, so it's easy to access that data
+    req.body.owner = req.session.userId
     const newFruit = req.body
     Fruit.create(newFruit)
     // send a 201 status, along with the json response of the new fruit
@@ -39,41 +42,66 @@ router.post('/', (req, res) => {
     })
 })
 
-
-// PUT route -> Update - > updates a specific fruit
-// PUT replaes the entire document with a new document from the req.body
-// PATCH is able to update specifi fields at specif times, but it requires more code to ensure that it works properly.
-router.put('/:id', (req, res) => {
-    // save the id to a variable for use later
-    const id = req.params.id
-    // save the request body to a variable for easy ref
-    const updatedFruit = req.body
-    // we're going to use the mongoose method:
-    // findByIdAndUpdate
-    // eventually we'll change how this route works, but for now we'll do everything in one shot.
-    Fruit.findByIdAndUpdate(id, updatedFruit, { new: true })
-        .then(fruit => {
-            console.log('the newly updated fruit', fruit)
-            // update sucess message will just be a 204 - no content
-            res.sendStatus(204)
+// GET route
+// Index -> This is a user specific index route
+// this will only show the logged in user's fruits
+router.get('/mine', (req, res) => {
+    // find fruits by ownership, using the req.session info
+    Fruit.find({ owner: req.session.userId })
+        .then(fruits => {
+            // if found, display the fruits
+            res.status(200).json({ fruits: fruits })
         })
+        // otherwise, throw an error
         .catch(err => {
             console.log(err)
-            res.status(404).json(err)
+            res.status(400).json(err)
         })
+})
+
+//PUT route
+// Update -> updates a specific fruit(only if the fruit's owner is updating)
+router.put('/:id', (req, res) => {
+    const id = req.params.id
+    Fruit.findById(id)
+    .then(fruit => {
+        // if the owner of the fruit is the person who is logged in
+        if (fruit.owner == req.session.userId) {
+            // send success message
+            res.sendStatus(204)
+            // update and save the fruit
+            return fruit.updateOne(req.body)
+        } else {
+            //otherwise send a 401 unauthorized status
+            res.sendStatus(401)
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(400).json(err)
+    })
 })
 
 
 // DELETE route -> delete -> delete a specific fruit
 router.delete('/:id', (req, res) => {
     const id = req.params.id
-    Fruit.findByIdAndRemove(id)
-    .then(() => {
-        res.sendStatus(204)
+    Fruit.findById(id)
+    .then(fruit => {
+        // if the owner of the fruit is the person who is logged in
+        if (fruit.owner == req.session.userId) {
+            // send success message
+            res.sendStatus(204)
+            // delete the fruit
+            return fruit.deleteOne()
+        } else {
+            //otherwise send a 401 unauthorized status
+            res.sendStatus(401)
+        }
     })
     .catch(err => {
         console.log(err)
-        res.status(404).json(err)
+        res.status(400).json(err)
     })
 })
 

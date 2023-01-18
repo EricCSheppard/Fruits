@@ -60,9 +60,9 @@ router.post('/login', async (req, res) => {
                     //this is where we use that session object that lives in our request object
                     req.session.username = username
                     req.session.loggedIn = true
-                    req.session.userID = user.id
+                    req.session.userId = user.id
 
-                    // console.log('this is req.session \n', req.session)
+                    console.log('this is req.session \n', req.session)
 
                     //we'll send a 201 response and the user as json (for now)
                     // we'll update this after a couple tests to adhere to best practices
